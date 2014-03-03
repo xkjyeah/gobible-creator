@@ -1,0 +1,20 @@
+#!/bin/bash
+
+SVN_REVISION=$(svn info | grep 'Revision' | awk ' { print $2 }')
+GIT_REVISION=$(git rev-parse HEAD)
+
+REVISION=""
+
+if [ ! x$SVN_REVISION = "x" ]
+then
+	REVISION="SVN-Version: $SVN_REVISION"
+elif [ ! x$GIT_REVISION = "x" ]
+then
+	REVISION="git-Version: $GIT_REVISION"
+else
+	REVISION=""
+fi
+
+echo "$REVISION"
+
+

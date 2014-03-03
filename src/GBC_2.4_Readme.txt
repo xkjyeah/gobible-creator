@@ -2,6 +2,11 @@
 Go Bible Software Release Notes - History of Changes since version 2.2.6
 ===========================================================================
 
+GoBibleCreator 2.4.6:
+
+- ReplaceLiteral was not working correctly if replacement was blank. Fixed
+- Build script supports git
+
 GoBibleCreator 2.4.5-svn83:
 
 December 27, 2012

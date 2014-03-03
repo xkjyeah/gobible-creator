@@ -19,7 +19,7 @@ jolon/xml/XMLParser.java \
 MyManifest.java \
 ThmlConverter.java
 
-GoBibleCreator.jar: compile version_number Manifest USFMSettings.txt
+GoBibleCreator.jar: compile version_number Manifest USFMSettings.txt 
 	jar cfm GoBibleCreator.jar Manifest *.class jolon usfm USFMSettings.txt version gobiblecreator
 
 .PHONY: version_number compile version_number
@@ -27,10 +27,12 @@ GoBibleCreator.jar: compile version_number Manifest USFMSettings.txt
 compile: $(JAVA_FILES)
 	javac $(JAVAC_FLAGS) $(JAVA_FILES)
 
-version_number:
+gobiblecreator:
+	mkdir -p gobiblecreator
+
+version_number: gobiblecreator
 	mkdir -p version
-	[ ! x$(RELEASE) = x1 ] && echo "SVNRevision: `svn info | grep 'Revision' | awk ' { print $$2 }'`" > gobiblecreator/version_info \
-	|| echo "" > gobiblecreator/version_info
+	[ ! x$(RELEASE) = x1 ] && ../scripts/version_number > gobiblecreator/version_info
 
 
 USFMLex.java: usfm.flex
