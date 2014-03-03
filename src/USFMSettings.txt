@@ -1,0 +1,146 @@
+// USFMSettings.txt
+// 
+// Controls how USFM files are interpreted. These defaults are hard-coded into
+// the interpreter. They may be overridden in this file.
+//
+// ParaTExt provides the USFM format. cf http://paratext.org/about/usfm
+
+// Defaults: (explanations follow)
+
+
+SingularTags: pmo pm pmc pmr mi nb cls pc pr qr qc pb b m p z li qm q pi ph
+SingularTagsWithNumbers: li qm q pi ph
+SingularGreedyTags: cl cp cd qa sr mr  ms mte mt s sr  r  d  sp is v c
+SingularGreedyTagsWithNumbers: ms mte mt s is
+DoubleTextualTags: qs qac add dc ndx nd ord pn pro qt sig sls wg wh tl em bd it bdit no sc k w
+DoubleTextualTagsWithNumbers: 
+DoubleAnnotationTags: ca va vp fe bk xdc fdc fm fig f x rq xot xnt iqt
+DoubleAnnotationTagsWithNumbers: 
+SignificantWhitespace: false
+
+ReplaceTag: /--newline--/\n/
+ReplaceTag: /--nbsp--/\uA0/
+
+ReplaceTag: /wj/\01/
+ReplaceTag: /wj*/\01/
+
+// ReplaceLiteral: /<</\u201C/
+// ReplaceLiteral: /</\u2018/
+// ReplaceLiteral: />>/\u201D/
+// ReplaceLiteral: />/\u2019/
+
+
+// Parameters in this file are CASE-SENSITIVE
+//
+// Comments start with '//'
+//
+// Long lines can be broken into multiple lines.
+// The first line MAY NOT start with a space. Subsequent lines MUST
+// start with a space. e.g.
+//
+//Parameter: Tag1 Tag2
+// Tag3
+//
+//is equivalent to:
+//
+//Parameter: Tag1 Tag2 Tag3
+//
+
+// Singular tags are tags that do not require a closure. They will be deleted
+// by the interpreter. e.g.
+//
+// SingularTags: ... pmo pm ...
+//
+// USFM:
+// \v 23 They wrote a letter that said:
+// \pmo We apostles and leaders send friendly greetings to all of you Gentiles who are followers of the Lord in Antioch, Syria, and Cilicia.
+// \pm
+// \v 24 We have heard that some people from here have terribly upset you by what they said. But we did not send them!
+// 
+// Processed into:
+// Verse 23: They wrote a letter that said: We apostles and leaders send
+// friendly greetings to all of you Gentiles who are followers of the Lord in
+// Antioch, Syria, and Cilicia.
+// Verse 24: We have heard that some people from here have terribly upset you by
+// what they said. But we did not send them!
+//
+// SingularTagsWithNumbers are interpreted similarly to SingularTags, except
+// they match tags with numbers after them.
+// 
+// SingularTagsWithNumbers: ... li ...
+//
+// Matches: \\li[0-9]+
+//
+
+//SingularTags: pmo pm pmc pmr mi nb cls pc pr qr qc pb b m p z li qm q pi ph
+//SingularTagsWithNumbers: li qm q pi ph
+
+// Singular greedy tags: All data up to the next singular greedy tag are
+// consumed and ignored. Note: it is necessary to include v and c in this
+// list, because \v and \c can act as 'stop' markers for other
+// greedy tags.
+
+//SingularGreedyTags: cl cp cd qa sr mr  ms mte mt s sr  r  d  sp is v c
+//SingularGreedyTagsWithNumbers: ms mte mt s
+
+// Double textual tags: The opening and closing tags are discarded.
+
+//DoubleTextualTags: qs qac add dc ndx nd ord pn pro qt sig sls wg wh tl em bd
+// it bdit no sc k w
+//DoubleTextualTagsWithNumbers: 
+
+// Double annotation tags: All data between the opening and closing tags are
+// discarded
+
+//DoubleAnnotationTags: ca va vp fe bk xdc fdc fm fig f x rq xot xnt iqt
+//DoubleAnnotationTagsWithNumbers: 
+
+// Determines whether multiple spaces in scripture text are collapsed
+// into a single space (a la HTML)
+// false -- Multiple spaces are collapsed
+// true -- Every space is honoured, except those after tag openings
+// SignificantWhitespace: false
+
+// Replacement table. This has priority over all tags.
+//
+// ReplaceTag replaces only standard character sequences specified in USFM
+// '~', '//'.
+//
+// --newline-- matches the '//' (discretionary line break) in USFM
+// --nbsp-- matches the '~' (no-break space) in USFM
+//
+//ReplaceTag: /--newline--/\n/
+//ReplaceTag: /--nbsp--/\uA0/
+//
+// Moreover, they can be used to specify replacements for tags (e.g. to replace
+// tags with formatting markers.
+// 
+// tag matches \tag (opening tag)
+// tag* matches \tag* (closing tag)
+//
+//ReplaceTag: /wj/\01/
+//ReplaceTag: /wj*/\01/
+//
+// Replacement Texts:
+//
+// You can escape characters using octal sequences (\0123) and hex sequences
+// (\u00A0). The commonly used escape sequences \r, \n, \b, \t and \\ are
+// recognized.
+//
+// Replacements are specified using
+// <CHAR> <TAG_TO_REPLACE> <CHAR> <REPLACEMENT TEXT> <CHAR>
+//
+// <CHAR> can be any non-space character. Therefore #wj#\01# is equivalent to
+// $wj$\01$.
+//
+//
+// ReplaceLiteral substitutes the replacement text for the literal sequence
+// specified in the first part in all text sequences.
+//
+// For obvious reasons, USE CAREFULLY
+//
+//Examples:
+//
+//ReplaceLiteral: /favour/favor/
+//ReplaceLiteral: /ß/ss/
+//
