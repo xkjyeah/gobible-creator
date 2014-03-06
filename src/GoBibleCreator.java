@@ -353,7 +353,7 @@ public abstract class GoBibleCreator
                 extractCommonFields(collectionsFile);
                 //make sure that the file extension is retrieved
                 extractUSFMfields(collectionsFile);
-                books = parseUSFM(baseSourceDirectory, sourceTextPath, sTitleTag);
+                books = parseUSFM(collectionsFile, baseSourceDirectory, sourceTextPath, sTitleTag);
             }
             else
             {
@@ -673,7 +673,7 @@ public abstract class GoBibleCreator
 	 * Parses the USFM files format and extracts and returns
 	 * books as a HashMap.
 	 */
-	public static HashMap parseUSFM(String baseSourceDirectory, String sourceTextPath, String sTitleTag) throws IOException
+	public static HashMap parseUSFM(File collectionsFile, String baseSourceDirectory, String sourceTextPath, String sTitleTag) throws IOException
 	{
             //iterate through the source file directory and get the filenames present
             //USFM uses a predefined file format of:
@@ -706,7 +706,7 @@ public abstract class GoBibleCreator
                           try
                           {
 				// Create a new book
-				Book book = new Book(baseSourceDirectory, sFilename, STYLE_RED, fileCodepage, useRedLettering, sTitleTag);
+				Book book = new Book(collectionsFile, sFilename, STYLE_RED, fileCodepage, useRedLettering, sTitleTag);
 				book.fileName = listOfFiles[i].getName();
 
 				books.put(book.name, book);
@@ -2130,7 +2130,7 @@ class Book
 	}
 
         //USFM file format
-	public Book(String baseSourceDirectory, String sFilename, char cSTYLE_RED, String fileCodepage, boolean useRedLettering, String sTitleTag)
+	public Book(File collectionsFile, String sFilename, char cSTYLE_RED, String fileCodepage, boolean useRedLettering, String sTitleTag)
 	{
             
             //open up the filename for parsing through line-by-line
@@ -2148,9 +2148,11 @@ class Book
                     interpreter = new USFMParse();
                     interpreter.sWJ = cSTYLE_RED;
                     interpreter.emptyVerseString = GoBibleCreator.EmptyVerseString;
-                    System.out.println( "Using USFM Parse Configuration file: " + 
-                            new File(baseSourceDirectory, GoBibleCreator.usfmParseConfigFile).getAbsolutePath() );
-                    interpreter.readConfig( new File(baseSourceDirectory, GoBibleCreator.usfmParseConfigFile).getAbsolutePath() );
+
+					String configFilePath = new File(collectionsFile.getParent(), GoBibleCreator.usfmParseConfigFile).getAbsolutePath();
+
+                    System.out.printf( "Using USFM Parse Configuration file: %s\n", configFilePath);
+                    interpreter.readConfig(configFilePath );
                 }
             
                 
