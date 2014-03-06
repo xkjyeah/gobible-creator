@@ -706,7 +706,7 @@ public abstract class GoBibleCreator
                           try
                           {
 				// Create a new book
-				Book book = new Book(sFilename, STYLE_RED, fileCodepage, useRedLettering, sTitleTag);
+				Book book = new Book(baseSourceDirectory, sFilename, STYLE_RED, fileCodepage, useRedLettering, sTitleTag);
 				book.fileName = listOfFiles[i].getName();
 
 				books.put(book.name, book);
@@ -2130,7 +2130,7 @@ class Book
 	}
 
         //USFM file format
-	public Book(String sFilename, char cSTYLE_RED, String fileCodepage, boolean useRedLettering, String sTitleTag)
+	public Book(String baseSourceDirectory, String sFilename, char cSTYLE_RED, String fileCodepage, boolean useRedLettering, String sTitleTag)
 	{
             
             //open up the filename for parsing through line-by-line
@@ -2149,8 +2149,8 @@ class Book
                     interpreter.sWJ = cSTYLE_RED;
                     interpreter.emptyVerseString = GoBibleCreator.EmptyVerseString;
                     System.out.println( "Using USFM Parse Configuration file: " + 
-                            new File(fIn.getParent(), GoBibleCreator.usfmParseConfigFile).getAbsolutePath() );
-                    interpreter.readConfig( new File(fIn.getParent(), GoBibleCreator.usfmParseConfigFile).getAbsolutePath() );
+                            new File(baseSourceDirectory, GoBibleCreator.usfmParseConfigFile).getAbsolutePath() );
+                    interpreter.readConfig( new File(baseSourceDirectory, GoBibleCreator.usfmParseConfigFile).getAbsolutePath() );
                 }
             
                 
