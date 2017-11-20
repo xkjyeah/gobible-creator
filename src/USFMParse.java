@@ -320,11 +320,13 @@ public class USFMParse {
 		
 		try {
 			// remove chapter headers part: delete everything before the first \v
+            // we now try to keep the headers and add it to the first verse
+            String heading = "";
 			LOOP: while (true) {
 				lex();
 		
 				switch (current.type) {
-				case TAG_OPEN:
+                    case TAG_OPEN:
 					if (current.data.equals("v")) {
 						break LOOP;
 					}
@@ -333,6 +335,13 @@ public class USFMParse {
                                                 System.out.println(current.toString());
 						return c;
 					}
+                    else if (isHeading(current.data)) {
+                        heading = parseVerse2();
+                        c.headingInfo.add(0);
+                        c.headingInfo.add(heading.length());
+                        c.allHeadings.append(heading);
+                        break LOOP;
+                    }
 					break;
 				case EOF:
 					return null;
@@ -344,6 +353,7 @@ public class USFMParse {
 				if (verseBody.length() == 0 && this.emptyVerseString != null) {
 					verseBody = new String(this.emptyVerseString);
 				}
+
 				c.verses.add(verseBody);
 				c.allVerses.append(verseBody);
 //			    System.err.printf("ch vs %d %s\n",
@@ -351,8 +361,15 @@ public class USFMParse {
 //				((String)c.verses.get( c.verses.size() - 1 )).trim());
 
 				// time to return because it's the next chapter
-				if (current.type == SymbolType.TAG_OPEN && current.data.equals("c") ) {
-					break;
+				if (current.type == SymbolType.TAG_OPEN ) {
+				    if (current.data.equals("c")) {
+                        break;
+                    } else if (isHeading(current.data)) {
+				        heading = parseVerse2();
+                        c.headingInfo.add(c.verses.size());
+                        c.headingInfo.add(heading.length());
+                        c.allHeadings.append(heading);
+                    }
 				}
 			}
 		
@@ -432,6 +449,9 @@ public class USFMParse {
 				else if (current.data.equals("c")) { // new chapter
 					return handleWhitespace(body.toString());
 				}
+                else if (isHeading(current.data)) { // new chapter
+                    return handleWhitespace(body.toString());
+                }
 				if (macroReplacementTable.containsKey(current.data)) {
 					body.append(macroReplacementTable.get(current.data));
 				}
@@ -482,7 +502,7 @@ public class USFMParse {
 		else
 			return handleWhitespace(body.toString());
 	}
-    
+
     public String handleWhitespace(String s) {
     	String parts[] = configTable.get("SignificantWhitespace");
 
@@ -506,6 +526,10 @@ public class USFMParse {
 		
 		return false;
 	}
+
+	private boolean isHeading(String comp) {
+            return comp.equals("s") || comp.equals("s1") || comp.equals("s2");
+    }
 	
 	private boolean isSingularGreedyTag(String comp) {
 	
