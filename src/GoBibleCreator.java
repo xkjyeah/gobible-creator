@@ -1640,6 +1640,7 @@ public abstract class GoBibleCreator
 			int fileNumber = 0;
 
 			StringBuffer buffer = new StringBuffer();
+			StringBuffer headingBuffer = new StringBuffer();
 
 			for (int chapterNumber = collectionBook.startChapter; chapterNumber <= collectionBook.endChapter; chapterNumber++)
 			{
@@ -1689,6 +1690,9 @@ public abstract class GoBibleCreator
 					jarOutputStream.putNextEntry(new JarEntry("Bible Data/" + thmlBook.fileName + "/" + thmlBook.fileName + " " + chapterNumber));
 					jarOutputStream.write(byteArray, 0, byteArray.length);
 				}
+
+				// We add all headings  to the buffer. Headings of one book go together in one entry
+				headingBuffer.append(chapter.allHeadings.toString());
 			}
 			
 			if (COMBINED_CHAPTERS)
@@ -1706,6 +1710,14 @@ public abstract class GoBibleCreator
 				byte[] verseBytes = buffer.toString().getBytes("UTF-8");
 				dataOutputStream.writeInt(verseBytes.length);
 				dataOutputStream.write(verseBytes, 0, verseBytes.length);
+			}
+
+			if (headingBuffer.length() > 0) {
+				// Write Headings file
+				jarOutputStream.putNextEntry(new JarEntry("Bible Data/" + thmlBook.fileName + "/Headings"));
+				byte[] headingBytes = headingBuffer.toString().getBytes("UTF-8");
+				dataOutputStream.writeInt(headingBytes.length);
+				dataOutputStream.write(headingBytes, 0, headingBytes.length);
 			}
 		}	
 	}
@@ -1727,11 +1739,22 @@ public abstract class GoBibleCreator
 		for (int chapterNumber = collectionBook.startChapter; chapterNumber <= collectionBook.endChapter; chapterNumber++)
 		{
 			Chapter chapter = (Chapter) xmlBook.chapters.elementAt(chapterNumber - xmlBook.startChapter);
-			
+
+			// Write the number of headings
+			output.writeShort(chapter.headingInfo.size()/2); // we have 2 entries for each heading
+
 			for (Enumeration e = chapter.verses.elements(); e.hasMoreElements(); )
 			{
 				String verse = (String) e.nextElement();
 				output.writeShort(verse.length());
+			}
+
+			// headingInfo contains two entries for each heading. The first says  after which verse each heading goes
+			// and the second says its length in characters
+			for (Enumeration e = chapter.headingInfo.elements(); e.hasMoreElements(); )
+			{
+				int num = (int) e.nextElement();
+				output.writeShort(num);
 			}
 		}		
 		
@@ -2270,6 +2293,8 @@ class Chapter
 	public Vector verses = new Vector();
 	public StringBuffer allVerses = new StringBuffer();
 	public int fileNumber;
+	public StringBuffer allHeadings = new StringBuffer();
+	public Vector headingInfo = new Vector(); // stores after which verse the heading goes and its length (2 ints per heading)
 
 }
 
